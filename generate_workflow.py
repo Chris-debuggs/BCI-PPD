@@ -1,125 +1,76 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import os
 
-def create_workflow():
-    fig, ax = plt.subplots(figsize=(10, 16))
-    ax.axis('off')
-    
-    # Coordinates and sizes
-    box_width = 6
-    box_height = 0.8
-    center_x = 5
-    
-    y_start = 14.5
-    y_step = -1.6
-    
-    def draw_box(ax, x, y, width, height, text, bg_color='#E5F0FA', edge_color='#2C3E50', text_size=12, fontweight='normal'):
-        rect = patches.FancyBboxPatch(
-            (x - width/2, y - height/2), width, height,
-            boxstyle="round,pad=0.1,rounding_size=0.1",
-            linewidth=1.5, edgecolor=edge_color, facecolor=bg_color
-        )
-        ax.add_patch(rect)
-        ax.text(x, y, text, ha='center', va='center', fontsize=text_size, fontweight=fontweight, color='#2C3E50', wrap=True)
+fig, ax = plt.subplots(figsize=(10, 14))
+ax.set_xlim(0, 10)
+ax.set_ylim(0, 14)
+ax.axis('off')
 
-    def draw_arrow(ax, x, y_from, y_to):
-        ax.annotate('', xy=(x, y_to), xytext=(x, y_from),
-                    arrowprops=dict(arrowstyle="->", color='#2C3E50', lw=2, mutation_scale=20))
-
-    # Title
-    ax.text(center_x, y_start + 1.2, "Research Workflow for EEG-Based Depression Biomarker Identification\nin Postpartum Employed Mothers", 
-            ha='center', va='center', fontsize=16, fontweight='bold', color='#2C3E50')
+# Box Drawing Helper
+def draw_box(ax, x, y, w, h, text, bg_color='#EBF3FA', border_color='#2C3E50', title='', fontsize=10, bold_title=True):
+    rect = patches.FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.1,rounding_size=0.15", 
+                                  linewidth=1.5, edgecolor=border_color, facecolor=bg_color)
+    ax.add_patch(rect)
     
-    # 1. Participant Recruitment
-    y_current = y_start
-    draw_box(ax, center_x, y_current, box_width, box_height, "Participant Recruitment")
-    
-    # 2. EPDS Assessment
-    draw_arrow(ax, center_x, y_current - box_height/2, y_current + y_step + box_height/2)
-    y_current += y_step
-    draw_box(ax, center_x, y_current, box_width, box_height, "EPDS Assessment")
+    if title and text:
+        ax.text(x + w/2, y + h - 0.3, title, weight='bold' if bold_title else 'normal',
+                ha='center', va='top', fontsize=fontsize+1, color='#1A252C')
+        ax.text(x + w/2, y + 0.3, text, ha='center', va='bottom', fontsize=fontsize-1, color='#2C3E50')
+    else:
+        main_text = title if title else text
+        ax.text(x + w/2, y + h/2, main_text, weight='bold' if bold_title else 'normal',
+                ha='center', va='center', fontsize=fontsize, color='#1A252C')
 
-    # 3. EEG Acquisition
-    draw_arrow(ax, center_x, y_current - box_height/2, y_current + y_step + box_height/2)
-    y_current += y_step
-    draw_box(ax, center_x, y_current, box_width, box_height, "EEG Acquisition\n(OpenBCI Cyton & Daisy + 7 Channels)", bg_color='#F0F4F8')
+# Arrow Helper (Box-to-Box)
+def draw_arrow(ax, x1, y1, x2, y2):
+    ax.annotate('', xy=(x2, y2), xytext=(x1, y1),
+                arrowprops=dict(arrowstyle="->", color='#2C3E50', lw=2, mutation_scale=15))
 
-    # 4. Experimental Protocol
-    draw_arrow(ax, center_x, y_current - box_height/2, y_current + y_step + box_height/2 - 0.4)
-    y_current += (y_step - 0.4)
-    protocol_height = 2.2
-    
-    # Outer box for protocol
-    rect_proto = patches.FancyBboxPatch(
-        (center_x - box_width/2 - 0.2, y_current - protocol_height/2), box_width + 0.4, protocol_height,
-        boxstyle="round,pad=0.1,rounding_size=0.1",
-        linewidth=1.5, edgecolor='#2C3E50', facecolor='#E8F5E9'
-    )
-    ax.add_patch(rect_proto)
-    ax.text(center_x, y_current + protocol_height/2 - 0.3, "Experimental Protocol", ha='center', va='center', fontsize=12, fontweight='bold', color='#2C3E50')
-    
-    # Inner boxes
-    draw_box(ax, center_x - 1.6, y_current - 0.2, 2.8, 1.2, "Resting-State EEG\n• Eyes Closed\n• Eyes Open", bg_color='#FFFFFF', text_size=10)
-    draw_box(ax, center_x + 1.6, y_current - 0.2, 2.8, 1.2, "Emotional Stimulus Task\n• Positive Images\n• Negative Images\n• Neutral Images", bg_color='#FFFFFF', text_size=10)
+# Workflow Step Definitions
+# Step 1: Participant Recruitment
+draw_box(ax, 2.0, 12.8, 6.0, 0.8, "", title="Participant Recruitment (N = 34)", bg_color='#EBF3FA')
+draw_arrow(ax, 5.0, 12.8, 5.0, 12.1)
 
-    # 5. EEG Preprocessing
-    draw_arrow(ax, center_x, y_current - protocol_height/2, y_current + y_step - protocol_height/2 + box_height/2)
-    y_current += y_step - 0.2
-    preproc_height = 1.6
-    
-    # Outer box for preprocessing
-    rect_preproc = patches.FancyBboxPatch(
-        (center_x - box_width/2 - 0.2, y_current - preproc_height/2), box_width + 0.4, preproc_height,
-        boxstyle="round,pad=0.1,rounding_size=0.1",
-        linewidth=1.5, edgecolor='#2C3E50', facecolor='#FFF3E0'
-    )
-    ax.add_patch(rect_preproc)
-    ax.text(center_x, y_current + preproc_height/2 - 0.3, "EEG Preprocessing", ha='center', va='center', fontsize=12, fontweight='bold', color='#2C3E50')
-    
-    # Inner flow
-    draw_box(ax, center_x - 2, y_current - 0.2, 1.6, 0.6, "Filtering", bg_color='#FFE0B2', text_size=10)
-    ax.annotate('', xy=(center_x - 1.1, y_current - 0.2), xytext=(center_x - 1.2, y_current - 0.2), arrowprops=dict(arrowstyle="->", color='#2C3E50', lw=1.5))
-    draw_box(ax, center_x, y_current - 0.2, 1.8, 0.6, "Artifact Removal", bg_color='#FFE0B2', text_size=10)
-    ax.annotate('', xy=(center_x + 1, y_current - 0.2), xytext=(center_x + 0.9, y_current - 0.2), arrowprops=dict(arrowstyle="->", color='#2C3E50', lw=1.5))
-    draw_box(ax, center_x + 2, y_current - 0.2, 1.6, 0.6, "Segmentation", bg_color='#FFE0B2', text_size=10)
+# Step 2: EPDS Assessment
+draw_box(ax, 2.0, 11.3, 6.0, 0.8, "", title="EPDS Assessment (Cut-offs: ≤9, 10–12, ≥13)", bg_color='#EBF3FA')
+draw_arrow(ax, 5.0, 11.3, 5.0, 10.6)
 
-    # 6. Feature Extraction
-    draw_arrow(ax, center_x, y_current - preproc_height/2, y_current + y_step - preproc_height/2 + box_height/2 + 0.4)
-    y_current += y_step - 0.4
-    draw_box(ax, center_x, y_current, box_width, box_height, "Feature Extraction\n(Time, Frequency, Non-Linear Features)", bg_color='#E8F5E9')
+# Step 3: EEG Acquisition
+draw_box(ax, 2.0, 9.8, 6.0, 0.8, "OpenBCI Cyton & Daisy (7 Channels: Fp1, Fp2, F3, F4, Fz, Cz, Pz)", 
+         title="EEG Acquisition", bg_color='#EBF3FA')
+draw_arrow(ax, 5.0, 9.8, 5.0, 9.1)
 
-    # 7. Statistical Analysis
-    draw_arrow(ax, center_x, y_current - box_height/2, y_current + y_step + box_height/2)
-    y_current += y_step
-    stat_height = 1.6
-    
-    # Outer box for statistical analysis
-    rect_stat = patches.FancyBboxPatch(
-        (center_x - box_width/2 - 0.2, y_current - stat_height/2), box_width + 0.4, stat_height,
-        boxstyle="round,pad=0.1,rounding_size=0.1",
-        linewidth=1.5, edgecolor='#2C3E50', facecolor='#E5F0FA'
-    )
-    ax.add_patch(rect_stat)
-    ax.text(center_x, y_current + stat_height/2 - 0.3, "Statistical Analysis", ha='center', va='center', fontsize=12, fontweight='bold', color='#2C3E50')
-    
-    # Inner flow
-    draw_box(ax, center_x - 1.5, y_current - 0.2, 2.5, 0.6, "Correlation Analysis\n(Spearman)", bg_color='#FFFFFF', text_size=10)
-    ax.annotate('', xy=(center_x + 0.1, y_current - 0.2), xytext=(center_x - 0.25, y_current - 0.2), arrowprops=dict(arrowstyle="->", color='#2C3E50', lw=1.5))
-    draw_box(ax, center_x + 1.5, y_current - 0.2, 2.5, 0.6, "Group Comparison\n(Mann-Whitney U)", bg_color='#FFFFFF', text_size=10)
+# Step 4: Experimental Protocol (Container)
+draw_box(ax, 1.5, 7.3, 7.0, 1.8, "", title="Experimental Protocol", bg_color='#E8F8F5', border_color='#16A085')
+draw_box(ax, 1.8, 7.5, 3.1, 1.1, "• Eyes Closed\n• Eyes Open", title="Resting-State EEG", bg_color='#FFFFFF', border_color='#16A085', fontsize=9)
+draw_box(ax, 5.1, 7.5, 3.1, 1.1, "• Positive Images\n• Negative Images\n• Neutral Images", title="Emotional Task", bg_color='#FFFFFF', border_color='#16A085', fontsize=9)
+draw_arrow(ax, 5.0, 7.3, 5.0, 6.6)
 
-    # 8. Biomarker Identification
-    draw_arrow(ax, center_x, y_current - stat_height/2, y_current + y_step + box_height/2)
-    y_current += y_step
-    draw_box(ax, center_x, y_current, box_width, box_height, "Depression Biomarker Identification\n(e.g., LPP, Alpha Power)", bg_color='#FFB74D', fontweight='bold')
+# Step 5: EEG Preprocessing (Container)
+draw_box(ax, 1.5, 5.3, 7.0, 1.3, "", title="EEG Preprocessing", bg_color='#FEF9E7', border_color='#F39C12')
+draw_box(ax, 1.8, 5.5, 1.9, 0.6, "", title="Filtering", bg_color='#FFFFFF', border_color='#F39C12', fontsize=8)
+draw_arrow(ax, 3.7, 5.8, 4.0, 5.8)
+draw_box(ax, 4.0, 5.5, 2.0, 0.6, "", title="Artifact Removal", bg_color='#FFFFFF', border_color='#F39C12', fontsize=8)
+draw_arrow(ax, 6.0, 5.8, 6.3, 5.8)
+draw_box(ax, 6.3, 5.5, 1.9, 0.6, "", title="Segmentation", bg_color='#FFFFFF', border_color='#F39C12', fontsize=8)
+draw_arrow(ax, 5.0, 5.3, 5.0, 4.6)
 
-    plt.xlim(0, 10)
-    plt.ylim(y_current - 1, y_start + 2)
-    
-    out_path = 'Research_Workflow_Diagram.png'
-    plt.savefig(out_path, dpi=300, bbox_inches='tight')
-    print(f"Workflow diagram successfully saved to {os.path.abspath(out_path)}")
-    plt.close()
+# Step 6: Feature Extraction (Fixed Categories including ERP)
+draw_box(ax, 1.5, 3.8, 7.0, 0.8, "(Statistical, Frequency-Domain, Nonlinear, ERP Features)", 
+         title="Feature Extraction (22 Features)", bg_color='#E8F8F5', border_color='#16A085')
+draw_arrow(ax, 5.0, 3.8, 5.0, 3.1)
 
-if __name__ == '__main__':
-    create_workflow()
+# Step 7: Statistical Analysis (Container)
+draw_box(ax, 1.5, 1.6, 7.0, 1.5, "", title="Statistical Analysis", bg_color='#EBF3FA', border_color='#2980B9')
+draw_box(ax, 1.8, 1.8, 3.1, 0.8, "Spearman Correlation (+ FDR)", title="Correlation Analysis", bg_color='#FFFFFF', border_color='#2980B9', fontsize=8)
+draw_box(ax, 5.1, 1.8, 3.1, 0.8, "Mann–Whitney U Test (+ Effect Size)", title="Group Comparison", bg_color='#FFFFFF', border_color='#2980B9', fontsize=8)
+draw_arrow(ax, 5.0, 1.6, 5.0, 0.9)
+
+# Step 8: Biomarker Identification (Fixed Target Labels)
+draw_box(ax, 1.5, 0.1, 7.0, 0.8, "Primary: LPP | Secondary: FAA, Signal Energy", 
+         title="Depression Biomarker Identification", bg_color='#FDEBD0', border_color='#E67E22')
+
+plt.title("Research Workflow for EEG-Based Depression Biomarker Identification\nin Postpartum Employed Mothers", 
+          fontsize=13, fontweight='bold', pad=20, color='#1A252C')
+
+plt.savefig("Research_Workflow_Diagram.png", dpi=300, bbox_inches='tight')
