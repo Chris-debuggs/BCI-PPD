@@ -1,76 +1,76 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-fig, ax = plt.subplots(figsize=(10, 14))
+fig, ax = plt.subplots(figsize=(10, 15))
 ax.set_xlim(0, 10)
-ax.set_ylim(0, 14)
+ax.set_ylim(0, 16)
 ax.axis('off')
 
 # Box Drawing Helper
-def draw_box(ax, x, y, w, h, text, bg_color='#EBF3FA', border_color='#2C3E50', title='', fontsize=10, bold_title=True):
-    rect = patches.FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.1,rounding_size=0.15", 
-                                  linewidth=1.5, edgecolor=border_color, facecolor=bg_color)
+def draw_box(ax, x, y, w, h, title='', text='', bg='#EBF3FA', border='#2C3E50', fontsize=10):
+    rect = patches.FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.05,rounding_size=0.12", 
+                                  linewidth=1.5, edgecolor=border, facecolor=bg)
     ax.add_patch(rect)
     
     if title and text:
-        ax.text(x + w/2, y + h - 0.3, title, weight='bold' if bold_title else 'normal',
-                ha='center', va='top', fontsize=fontsize+1, color='#1A252C')
-        ax.text(x + w/2, y + 0.3, text, ha='center', va='bottom', fontsize=fontsize-1, color='#2C3E50')
-    else:
-        main_text = title if title else text
-        ax.text(x + w/2, y + h/2, main_text, weight='bold' if bold_title else 'normal',
-                ha='center', va='center', fontsize=fontsize, color='#1A252C')
+        ax.text(x + w/2, y + h - 0.2, title, weight='bold', ha='center', va='top', fontsize=fontsize, color='#1A252C')
+        ax.text(x + w/2, y + 0.2, text, ha='center', va='bottom', fontsize=fontsize-1, color='#2C3E50')
+    elif title:
+        ax.text(x + w/2, y + h/2, title, weight='bold', ha='center', va='center', fontsize=fontsize, color='#1A252C')
+    elif text:
+        ax.text(x + w/2, y + h/2, text, ha='center', va='center', fontsize=fontsize, color='#2C3E50')
 
-# Arrow Helper (Box-to-Box)
-def draw_arrow(ax, x1, y1, x2, y2):
-    ax.annotate('', xy=(x2, y2), xytext=(x1, y1),
+def draw_arrow(ax, y_start, y_end, x=5.0):
+    ax.annotate('', xy=(x, y_end), xytext=(x, y_start),
                 arrowprops=dict(arrowstyle="->", color='#2C3E50', lw=2, mutation_scale=15))
 
-# Workflow Step Definitions
+# Header Title
+ax.text(5.0, 15.3, "Research Workflow for EEG-Based Depression Biomarker Identification\nin Postpartum Employed Mothers", 
+        fontsize=13, fontweight='bold', ha='center', va='center', color='#1A252C')
+
 # Step 1: Participant Recruitment
-draw_box(ax, 2.0, 12.8, 6.0, 0.8, "", title="Participant Recruitment (N = 34)", bg_color='#EBF3FA')
-draw_arrow(ax, 5.0, 12.8, 5.0, 12.1)
+draw_box(ax, 2.0, 14.1, 6.0, 0.7, title="Participant Recruitment (N = 34)")
+draw_arrow(ax, 14.1, 13.4)
 
 # Step 2: EPDS Assessment
-draw_box(ax, 2.0, 11.3, 6.0, 0.8, "", title="EPDS Assessment (Cut-offs: ≤9, 10–12, ≥13)", bg_color='#EBF3FA')
-draw_arrow(ax, 5.0, 11.3, 5.0, 10.6)
+draw_box(ax, 2.0, 12.7, 6.0, 0.7, title="EPDS Assessment (Cut-offs: ≤9, 10–12, ≥13)")
+draw_arrow(ax, 12.7, 12.0)
 
 # Step 3: EEG Acquisition
-draw_box(ax, 2.0, 9.8, 6.0, 0.8, "OpenBCI Cyton & Daisy (7 Channels: Fp1, Fp2, F3, F4, Fz, Cz, Pz)", 
-         title="EEG Acquisition", bg_color='#EBF3FA')
-draw_arrow(ax, 5.0, 9.8, 5.0, 9.1)
+draw_box(ax, 2.0, 11.0, 6.0, 1.0, title="EEG Acquisition", text="OpenBCI Cyton & Daisy (7 Channels: Fp1, Fp2, F3, F4, Fz, Cz, Pz)")
+draw_arrow(ax, 11.0, 10.3)
 
-# Step 4: Experimental Protocol (Container)
-draw_box(ax, 1.5, 7.3, 7.0, 1.8, "", title="Experimental Protocol", bg_color='#E8F8F5', border_color='#16A085')
-draw_box(ax, 1.8, 7.5, 3.1, 1.1, "• Eyes Closed\n• Eyes Open", title="Resting-State EEG", bg_color='#FFFFFF', border_color='#16A085', fontsize=9)
-draw_box(ax, 5.1, 7.5, 3.1, 1.1, "• Positive Images\n• Negative Images\n• Neutral Images", title="Emotional Task", bg_color='#FFFFFF', border_color='#16A085', fontsize=9)
-draw_arrow(ax, 5.0, 7.3, 5.0, 6.6)
+# Step 4: Experimental Protocol (Container Box)
+draw_box(ax, 1.5, 8.0, 7.0, 2.3, bg='#E8F8F5', border='#16A085')
+ax.text(5.0, 10.0, "Experimental Protocol", weight='bold', ha='center', va='top', fontsize=11, color='#16A085')
+draw_box(ax, 1.8, 8.2, 3.1, 1.4, title="Resting-State EEG", text="• Eyes Closed\n• Eyes Open", bg='#FFFFFF', border='#16A085', fontsize=9)
+draw_box(ax, 5.1, 8.2, 3.1, 1.4, title="Emotional Task", text="• Positive Images\n• Negative Images\n• Neutral Images", bg='#FFFFFF', border='#16A085', fontsize=9)
+draw_arrow(ax, 8.0, 7.3)
 
-# Step 5: EEG Preprocessing (Container)
-draw_box(ax, 1.5, 5.3, 7.0, 1.3, "", title="EEG Preprocessing", bg_color='#FEF9E7', border_color='#F39C12')
-draw_box(ax, 1.8, 5.5, 1.9, 0.6, "", title="Filtering", bg_color='#FFFFFF', border_color='#F39C12', fontsize=8)
-draw_arrow(ax, 3.7, 5.8, 4.0, 5.8)
-draw_box(ax, 4.0, 5.5, 2.0, 0.6, "", title="Artifact Removal", bg_color='#FFFFFF', border_color='#F39C12', fontsize=8)
-draw_arrow(ax, 6.0, 5.8, 6.3, 5.8)
-draw_box(ax, 6.3, 5.5, 1.9, 0.6, "", title="Segmentation", bg_color='#FFFFFF', border_color='#F39C12', fontsize=8)
-draw_arrow(ax, 5.0, 5.3, 5.0, 4.6)
+# Step 5: EEG Preprocessing (Container Box)
+draw_box(ax, 1.5, 5.5, 7.0, 1.8, bg='#FEF9E7', border='#F39C12')
+ax.text(5.0, 7.0, "EEG Preprocessing", weight='bold', ha='center', va='top', fontsize=11, color='#D35400')
+draw_box(ax, 1.8, 5.7, 1.8, 0.8, title="Filtering", bg='#FFFFFF', border='#F39C12', fontsize=9)
+ax.annotate('', xy=(4.0, 6.1), xytext=(3.6, 6.1), arrowprops=dict(arrowstyle="->", color='#F39C12', lw=1.5))
+draw_box(ax, 4.0, 5.7, 2.0, 0.8, title="Artifact Removal", bg='#FFFFFF', border='#F39C12', fontsize=9)
+ax.annotate('', xy=(6.3, 6.1), xytext=(6.0, 6.1), arrowprops=dict(arrowstyle="->", color='#F39C12', lw=1.5))
+draw_box(ax, 6.3, 5.7, 1.8, 0.8, title="Segmentation", bg='#FFFFFF', border='#F39C12', fontsize=9)
+draw_arrow(ax, 5.5, 4.8)
 
-# Step 6: Feature Extraction (Fixed Categories including ERP)
-draw_box(ax, 1.5, 3.8, 7.0, 0.8, "(Statistical, Frequency-Domain, Nonlinear, ERP Features)", 
-         title="Feature Extraction (22 Features)", bg_color='#E8F8F5', border_color='#16A085')
-draw_arrow(ax, 5.0, 3.8, 5.0, 3.1)
+# Step 6: Feature Extraction
+draw_box(ax, 1.5, 3.8, 7.0, 1.0, title="Feature Extraction (22 Features)", 
+         text="Statistical, Frequency-Domain, Nonlinear, ERP Features", bg='#E8F8F5', border='#16A085')
+draw_arrow(ax, 3.8, 3.1)
 
-# Step 7: Statistical Analysis (Container)
-draw_box(ax, 1.5, 1.6, 7.0, 1.5, "", title="Statistical Analysis", bg_color='#EBF3FA', border_color='#2980B9')
-draw_box(ax, 1.8, 1.8, 3.1, 0.8, "Spearman Correlation (+ FDR)", title="Correlation Analysis", bg_color='#FFFFFF', border_color='#2980B9', fontsize=8)
-draw_box(ax, 5.1, 1.8, 3.1, 0.8, "Mann–Whitney U Test (+ Effect Size)", title="Group Comparison", bg_color='#FFFFFF', border_color='#2980B9', fontsize=8)
-draw_arrow(ax, 5.0, 1.6, 5.0, 0.9)
+# Step 7: Statistical Analysis (Container Box)
+draw_box(ax, 1.5, 1.3, 7.0, 1.8, bg='#EBF3FA', border='#2980B9')
+ax.text(5.0, 2.8, "Statistical Analysis", weight='bold', ha='center', va='top', fontsize=11, color='#2980B9')
+draw_box(ax, 1.8, 1.5, 3.1, 1.0, title="Correlation Analysis", text="Spearman Correlation (+ FDR)", bg='#FFFFFF', border='#2980B9', fontsize=8)
+draw_box(ax, 5.1, 1.5, 3.1, 1.0, title="Group Comparison", text="Mann–Whitney U Test (+ Effect Size)", bg='#FFFFFF', border='#2980B9', fontsize=8)
+draw_arrow(ax, 1.3, 0.6)
 
-# Step 8: Biomarker Identification (Fixed Target Labels)
-draw_box(ax, 1.5, 0.1, 7.0, 0.8, "Primary: LPP | Secondary: FAA, Signal Energy", 
-         title="Depression Biomarker Identification", bg_color='#FDEBD0', border_color='#E67E22')
+# Step 8: Biomarker Identification
+draw_box(ax, 1.5, -0.2, 7.0, 0.8, title="Depression Biomarker Identification", 
+         text="Primary: LPP | Secondary: Frontal Alpha Asymmetry, Signal Energy", bg='#FDEBD0', border='#E67E22')
 
-plt.title("Research Workflow for EEG-Based Depression Biomarker Identification\nin Postpartum Employed Mothers", 
-          fontsize=13, fontweight='bold', pad=20, color='#1A252C')
-
-plt.savefig("Research_Workflow_Diagram.png", dpi=300, bbox_inches='tight')
+plt.savefig("Research_Workflow_Diagram_FIXED.png", dpi=300, bbox_inches='tight')
