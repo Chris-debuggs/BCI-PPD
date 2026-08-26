@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
-fig, ax = plt.subplots(figsize=(10, 16))
+fig, ax = plt.subplots(figsize=(10, 18))
 ax.set_xlim(0, 10)
-ax.set_ylim(-0.5, 16.2)
+ax.set_ylim(-3.5, 16.2) # Shifted bottom bound down to -3.5
 ax.axis('off')
 
 # Box Drawing Helper
@@ -67,10 +69,25 @@ draw_box(ax, 1.5, 1.5, 7.0, 1.8, bg='#EBF3FA', border='#2980B9')
 ax.text(5.0, 3.0, "Statistical Analysis", weight='bold', ha='center', va='top', fontsize=11, color='#2980B9')
 draw_box(ax, 1.8, 1.7, 3.1, 1.0, title="Correlation Analysis", text="Spearman Correlation (+ FDR)", bg='#FFFFFF', border='#2980B9', fontsize=8)
 draw_box(ax, 5.1, 1.7, 3.1, 1.0, title="Group Comparison", text="Mann–Whitney U Test (+ Effect Size)", bg='#FFFFFF', border='#2980B9', fontsize=8)
-draw_arrow(ax, 1.5, 0.8)
+draw_arrow(ax, 1.5, 0.85)
+
+# INSERT IMAGE HERE (Scaled down and placed in a container)
+try:
+    img = mpimg.imread(r'C:\Users\cnevi\Projects\BCI-PPD\sample_image.png')
+    # Reduced zoom to make the image much smaller
+    imagebox = OffsetImage(img, zoom=0.25) 
+    # Placement at x=5.0, y=-0.6, with a visible bounding box (square canvas)
+    ab = AnnotationBbox(imagebox, (5.0, -0.3), frameon=False, 
+                        bboxprops=dict(edgecolor='#2C3E50', facecolor='#FFFFFF', boxstyle="round,pad=0.8", lw=1.5))
+    ax.add_artist(ab)
+    
+    # Draw arrow from image down to the final box
+    # draw_arrow(ax, -1.5, -2.2)
+except Exception as e:
+    print(f"Error loading image: {e}")
 
 # Step 8: Biomarker Identification (Lifted up above y=0)
-draw_box(ax, 1.5, 0.0, 7.0, 0.8, title="Depression Biomarker Identification", 
+draw_box(ax, 1.5, -2.5, 7.0, 0.8, title="Depression Biomarker Identification", 
          text="Primary: LPP | Secondary: Frontal Alpha Asymmetry, Signal Energy", bg='#FDEBD0', border='#E67E22')
 
 plt.savefig("Research_Workflow_Diagram_PERFECT.png", dpi=300, bbox_inches='tight')
